@@ -7,90 +7,15 @@
          $(document).ready(function(){
 	        $('#treeViewDiv').jstree({
 	                'json_data' : {
-		                //url commented since it's fnot etching data in right json format
-	                   //'url' : '${request.contextPath + '/home/list'}',
-	                    'data' : [
-	                              {
-	                                  "data" : "Google",
-	                                  "children" :[
-	                                               {"data": "Finance",
-	                                                 "children" : [
-	                                                                 {
-	                                                                     "data":"Accounting",
-	                                                                     "children":[
-	                                                                                  {"data":"Person1"},
-	                                                                                  {"data" :"Person2"}
-	                                                                                 ]
-	                                                                 },
-	                                                                 {
-	                                                                     "data":"Billing",
-	                                                                     "children":[
-	                                                                                  {"data":"Person1"},
-	                                                                                  {"data" :"Person2"}
-	                                                                                 ]
-	                                                                 }
-	                                                               ]  
-	                                               },
-	                                               {"data": "HR",
-	                                                   "children" : [
-	                                                                   {
-	                                                                       "data":"Traning",
-	                                                                       "children":[
-	                                                                                    {"data":"Person1"},
-	                                                                                    {"data" :"Person2"}
-	                                                                                   ]
-	                                                                   },
-	                                                                   {
-	                                                                       "data":"Recruitment",
-	                                                                       "children":[
-	                                                                                    {"data":"Person1"},
-	                                                                                    {"data" :"Person2"}
-	                                                                                   ]
-	                                                                   }
-	                                                                 ]  
-	                                                 },
-	                                                 {"data": "R&D",
-	                                                     "children" : [
-	                                                                     {
-	                                                                         "data":"Scientific",
-	                                                                         "children":[
-	                                                                                      {"data":"Person1"},
-	                                                                                      {"data" :"Person2"}
-	                                                                                     ]
-	                                                                     },
-	                                                                     {
-	                                                                         "data":"Industrial",
-	                                                                         "children":[
-	                                                                                      {"data":"Person1"},
-	                                                                                      {"data" :"Person2"}
-	                                                                                     ]
-	                                                                     }
-	                                                                   ]  
-	                                                   },
-	                                                   {"data": "Testing",
-	                                                       "children" : [
-	                                                                       {
-	                                                                           "data":"Manual",
-	                                                                           "children":[
-	                                                                                        {"data":"Person1"},
-	                                                                                        {"data" :"Person2"}
-	                                                                                       ]
-	                                                                       },
-	                                                                       {
-	                                                                           "data":"Automation",
-	                                                                           "children":[
-	                                                                                        {"data":"Person1"},
-	                                                                                        {"data" :"Person2"}
-	                                                                                       ]
-	                                                                       }
-	                                                                     ]  
-	                                                     }
-	                                              ],
-	                                  "state" : "open"
-	                              }
-	                          ]
+	                	"ajax" : {
+	                				                
+			                   'url' : '${request.contextPath + '/home/jsontree'}',
+			                    data : function(data){
+				                    return data  
+				                }
+	                	}     
 	              },
-	              "plugins" : [ "themes", "json_data", "ui" ]
+	              "plugins" : [ "themes", "json_data" ]
 	        });
          });
         
