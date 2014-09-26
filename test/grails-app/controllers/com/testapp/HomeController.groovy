@@ -1,28 +1,48 @@
 package com.testapp
-import com.google.gson.Gson
-import com.google.gson.JsonArray;
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class HomeController {
 
+	def jsonTree
     def index = {
 	       render(view :"index")	
 	}
 	
 	
-	def jsontree = {
+	def treeview = {
 		
+		def mainTree = getTreeData()
+		jsonTree = mainTree as JSON
+		
+		render jsonTree
+	}
+	
+	def createNode = {
+		def nodeidToAdd = params.nodeID
+		def nodeName = params.nodeName
+		
+		jsonTree = addChildNode(jsonTree, nodeidToAdd, nodeName)
+		println "new json:"+ jsonTree
+		
+		render jsonTree
+	}
+	
+	private Tree getTreeData() {
 		Tree mainTree = new Tree()
-		mainTree.id = "root"
+		def attr = new Attribute()
+		attr.id = "root"
+		mainTree.attr = attr
 		mainTree.data = "Google"
 		
 		List<Tree> childList = new ArrayList<Tree>()
 		List subChildList = new ArrayList();
 		
 		Tree tree1 = new Tree()
-		tree1.id = "Finance"
+		attr = new Attribute()
+		attr.id = "Finance"
+		tree1.attr = attr
 		tree1.data = "Finance"
 		subChildList = new ArrayList()
 		subChildList.add(createTree("Accounting", ["John","Jack"]))
@@ -31,8 +51,10 @@ class HomeController {
 		childList.add(tree1)
 		
 		Tree tree2 = new Tree()
+		attr = new Attribute()
+		attr.id = "idHR"
 		tree2.data = "HR"
-		tree2.id = "idHR"
+		tree2.attr = attr
 		subChildList = new ArrayList()
 		subChildList.add(createTree("Training", ["Adam","Gilchrist"]))
 		subChildList.add(createTree("Recruitment", ["Gale", "Steve"]))
@@ -40,7 +62,9 @@ class HomeController {
 		childList.add(tree2)
 		
 		Tree tree3 = new Tree()
-		tree3.id = "R&D"
+		attr = new Attribute()
+		attr.id = "R&D"
+		tree3.attr = attr
 		tree3.data = "R&D"
 		subChildList = new ArrayList()
 		subChildList.add(createTree("Scientific", ["Kalam","Amar"]))
@@ -49,8 +73,10 @@ class HomeController {
 		childList.add(tree3)
 		
 		Tree tree4 = new Tree()
+		attr = new Attribute()
+		attr.id = "testingID"
+		tree4.attr = attr
 		tree4.data = "Testing"
-		tree4.id = "testingID"
 		subChildList = new ArrayList()
 		subChildList.add(createTree("Manual", ["TestM1","TestM2"]))
 		subChildList.add(createTree("Automation", ["TestA1","TestA2"]))
@@ -58,22 +84,23 @@ class HomeController {
 		childList.add(tree4)
 		
 		mainTree.children = childList
-		def jsonTree = mainTree as JSON
 		
-		jsonTree = addChildNode(jsonTree, "R&D", "Technology")
-		
-		render jsonTree
+		return mainTree
 	}
 	
 	private Tree createTree(String node, List list){
 		def tree = new Tree()
+		def attr = new Attribute()
 		def children = new ArrayList()
-		tree.id = node
+		attr.id = node
+		tree.attr = attr
 		tree.data = node
 		tree.children = []
 		list.each { childNode ->
 			def tree2 = new Tree()
-			tree2.id = childNode
+			attr = new Attribute()
+			attr.id = childNode
+			tree2.attr = attr
 			tree2.data = childNode
 			tree2.children = []
 			children.add(tree2)
@@ -85,11 +112,13 @@ class HomeController {
 	private JSON addChildNode(def jsonTree, String nodeidToAdd, String nodeName){
 		def jsonTreeObj = JSON.parse(jsonTree.toString())
 		Tree subNode = new Tree()
-		subNode.id = "subNode"
+		def attr = new Attribute()
+		attr.id = nodeName
+		subNode.attr = attr
 		subNode.data = nodeName
 		subNode.children = []
 		
-		if(jsonTreeObj.id == nodeidToAdd){
+		if(jsonTreeObj.attr.id == nodeidToAdd){
 			jsonTreeObj.children.add(subNode)
 		}else {
 			getChildren(jsonTreeObj, nodeidToAdd, subNode)
@@ -101,7 +130,7 @@ class HomeController {
 	private JSONObject getChildren(JSONObject tree, String nodeidToAdd, Tree subNode){
 		if(tree.children != null && tree.children != JSONObject.NULL){
 			tree.children.each { it ->
-				if(it.id == nodeidToAdd){
+				if(it.attr.id == nodeidToAdd){
 					it.children.add(subNode)
 					return;
 				}else {
