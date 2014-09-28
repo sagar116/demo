@@ -27,6 +27,7 @@
 	            }
 	            
 	            var  data = "nodeID="+data.rslt.parent[0].id+"&nodeName="+data.rslt.name; 
+	            alert(data)
 	            $.ajax({
 		            url : "${request.contextPath + '/home/createNode'}",
 		            type: "POST",

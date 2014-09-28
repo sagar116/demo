@@ -15,6 +15,7 @@ class HomeController {
 		
 		def mainTree = getTreeData()
 		jsonTree = mainTree as JSON
+		println jsonTree
 		
 		render jsonTree
 	}
@@ -23,7 +24,15 @@ class HomeController {
 		def nodeidToAdd = params.nodeID
 		def nodeName = params.nodeName
 		
-		jsonTree = addChildNode(jsonTree, nodeidToAdd, nodeName)
+		Tree newNode = new Tree()
+		def attr = new Attribute()
+		attr.id = nodeidToAdd +"_"+ nodeName
+		newNode.attr = attr
+		newNode.data = nodeName
+		newNode.children = []
+		def newNodeJson = newNode as JSON
+		
+		jsonTree = addChildNode(jsonTree, nodeidToAdd, newNodeJson)
 		println "new json:"+ jsonTree
 		
 		render jsonTree
@@ -41,45 +50,45 @@ class HomeController {
 		
 		Tree tree1 = new Tree()
 		attr = new Attribute()
-		attr.id = "Finance"
+		attr.id = "root_fin"
 		tree1.attr = attr
 		tree1.data = "Finance"
 		subChildList = new ArrayList()
-		subChildList.add(createTree("Accounting", ["John","Jack"]))
-		subChildList.add(createTree("Billing", ["Abc", "Bbc"]))
+		subChildList.add(createTree("root_fin_acc","Accounting", ["John","Jack"]))
+		subChildList.add(createTree("root_fin_bill","Billing", ["Abc", "Bbc"]))
 		tree1.children = subChildList
 		childList.add(tree1)
 		
 		Tree tree2 = new Tree()
 		attr = new Attribute()
-		attr.id = "idHR"
+		attr.id = "root_hr"
 		tree2.data = "HR"
 		tree2.attr = attr
 		subChildList = new ArrayList()
-		subChildList.add(createTree("Training", ["Adam","Gilchrist"]))
-		subChildList.add(createTree("Recruitment", ["Gale", "Steve"]))
+		subChildList.add(createTree("root_hr_training","Training", ["Adam","Gilchrist"]))
+		subChildList.add(createTree("root_hr_rec","Recruitment", ["Gale", "Steve"]))
 		tree2.children = subChildList
 		childList.add(tree2)
 		
 		Tree tree3 = new Tree()
 		attr = new Attribute()
-		attr.id = "R&D"
+		attr.id = "root_rd"
 		tree3.attr = attr
 		tree3.data = "R&D"
 		subChildList = new ArrayList()
-		subChildList.add(createTree("Scientific", ["Kalam","Amar"]))
-		subChildList.add(createTree("Industrial", ["Anil","Mittal"]))
+		subChildList.add(createTree("root_rd_scientific","Scientific", ["Kalam","Amar"]))
+		subChildList.add(createTree("root_rd_industrial","Industrial", ["Anil","Mittal"]))
 		tree3.children = subChildList
 		childList.add(tree3)
 		
 		Tree tree4 = new Tree()
 		attr = new Attribute()
-		attr.id = "testingID"
+		attr.id = "root_testing"
 		tree4.attr = attr
 		tree4.data = "Testing"
 		subChildList = new ArrayList()
-		subChildList.add(createTree("Manual", ["TestM1","TestM2"]))
-		subChildList.add(createTree("Automation", ["TestA1","TestA2"]))
+		subChildList.add(createTree("root_testing_manual","Manual", ["TestM1","TestM2"]))
+		subChildList.add(createTree("root_testing_auto","Automation", ["TestA1","TestA2"]))
 		tree4.children = subChildList
 		childList.add(tree4)
 		
@@ -88,18 +97,18 @@ class HomeController {
 		return mainTree
 	}
 	
-	private Tree createTree(String node, List list){
+	private Tree createTree(String parentID, String node, List list){
 		def tree = new Tree()
 		def attr = new Attribute()
 		def children = new ArrayList()
-		attr.id = node
+		attr.id = parentID
 		tree.attr = attr
 		tree.data = node
 		tree.children = []
 		list.each { childNode ->
 			def tree2 = new Tree()
 			attr = new Attribute()
-			attr.id = childNode
+			attr.id = parentID +"_"+ childNode
 			tree2.attr = attr
 			tree2.data = childNode
 			tree2.children = []
@@ -109,32 +118,28 @@ class HomeController {
 		return tree
 	}
 	
-	private JSON addChildNode(def jsonTree, String nodeidToAdd, String nodeName){
+	private JSON addChildNode(def jsonTree, String nodeidToAdd, def newNodeJson){
 		def jsonTreeObj = JSON.parse(jsonTree.toString())
-		Tree subNode = new Tree()
-		def attr = new Attribute()
-		attr.id = nodeName
-		subNode.attr = attr
-		subNode.data = nodeName
-		subNode.children = []
+		def newNode = JSON.parse(newNodeJson.toString())
 		
 		if(jsonTreeObj.attr.id == nodeidToAdd){
-			jsonTreeObj.children.add(subNode)
+			jsonTreeObj.children.add(newNode)
 		}else {
-			getChildren(jsonTreeObj, nodeidToAdd, subNode)
+			getChildren(jsonTreeObj, nodeidToAdd, newNode)
 		}
 		
 		return jsonTreeObj 
 	}
 	
-	private JSONObject getChildren(JSONObject tree, String nodeidToAdd, Tree subNode){
+	private JSONObject getChildren(JSONObject tree, String nodeidToAdd, JSONObject newNode){
 		if(tree.children != null && tree.children != JSONObject.NULL){
 			tree.children.each { it ->
-				if(it.attr.id == nodeidToAdd){
-					it.children.add(subNode)
-					return;
-				}else {
-				   getChildren(it, nodeidToAdd, subNode)
+				if(nodeidToAdd.contains(it.attr.id)){
+					if(nodeidToAdd.equals(it.attr.id)){
+					  it.children.add(newNode)
+					}else{
+					  getChildren(it, nodeidToAdd, newNode)
+					}
 				}
 			}
 		}
